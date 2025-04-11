@@ -1,0 +1,98 @@
+//STL5Assoc21°.Дан вектор V.Выполнить группировку элементов вектора V, используя в
+//качестве ключа группировки последнюю(т.е.правую) цифру элемента : в одну группу
+//должны входить все элементы вектора V, оканчивающиеся на одну и ту же цифру
+//(сгруппированные элементы должны располагаться в том же порядке, в котором они
+//располагались в исходном векторе).Представить результат группировки в виде
+//мультиотображения M(класса multimap), ключами которого являются ключи группировки, т.е.
+//последние цифры элементов вектора V, а значениями — элементы вектора,
+//оканчивающиеся на соответствующую цифру(таким образом, отображение M должно иметь
+//тип multimap<int, int>).Вывести полученное отображение(для каждого элемента отображения
+//M вначале выводить ключ, а затем связанный с ним элемент вектора V; ключи могут
+//повторяться).Для перебора элементов контейнеров использовать циклы с параметрами
+//итераторами.
+#include <iostream>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <ctime>
+#include <string>
+#include <sstream>
+using namespace std;
+
+
+int posl(int num) {
+    return abs(num) % 10;
+}
+int main() {
+    setlocale(LC_ALL, "RU");
+    srand(time(nullptr));
+
+    vector<int> V;
+    int choice;
+
+    cout << " Выберите способ ввода значений:" << endl;
+    cout << " 1. Ввод вручную." << endl;
+    cout << " 2. Ввод из файла." << endl;
+    cout << " 3. Заполнение случайными числами." << endl;
+    cout << " ";
+    cin >> choice;
+    cin.ignore();
+
+    switch (choice) {
+    case 1: {
+        string line;
+        cout << " Введите числа через пробел ( Нажмите Enter после ввода ): ";
+        getline(cin, line);
+        stringstream s(line);
+        int num;
+        while (s >> num) {
+            V.push_back(num);
+        }
+        break;
+    }
+    case 2: {
+        ifstream file("Задание3.txt");
+        if (!file.is_open()) {
+            cout << " Не удалось открыть файл." << endl;
+            exit(0);
+        }
+        int num;
+        while (file >> num) {
+            V.push_back(num);
+        }
+        file.close();
+        break;
+    }
+    case 3: {
+        int count;
+        cout << " Введите количество чисел: ";
+        cin >> count;
+        for (int i = 0; i < count; i++) {
+            V.push_back(1 + rand() % 1000);
+        }
+        break;
+    }
+    default: {
+        cout << "Недопустимое значение." << endl;
+        return 1;
+    }
+    }
+    cout << endl;
+    cout << " Вектор: "<< endl <<" ";
+    for (int num : V) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    multimap<int, int> M;
+    for (int num : V) {
+        M.insert({ posl(num), num });
+    }
+    cout << endl;
+    cout << " Результат: "<< endl;
+    for (auto& it : M) {
+        cout << " " << it.first << " - " << it.second << endl;
+    }
+
+    return 0;
+}
