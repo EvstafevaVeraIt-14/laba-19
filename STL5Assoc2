@@ -1,0 +1,235 @@
+//STL5Assoc2.Дан вектор V0, целое число N(> 0) и набор векторов V1, …, VN.Известно, что
+//размер вектора V0 не превосходит размера любого из векторов V1, …, VN.Найти количество
+//векторов VI, I = 1, …, N, в которых содержатся все элементы вектора V0(без учета их
+//повторений).Использовать алгоритм includes, применяя его в цикле к двум множествам, одно
+//из которых создано на основе вектора V0, а другое на очередной итерации содержит элементы
+//очередного из векторов VI, I = 1, …, N.
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <set>
+#include <fstream>
+#include <algorithm>
+#include <sstream>
+using namespace std;
+
+bool IsNumber(const string& str) {
+    if (str.empty()) return false;
+    int start = (str[0] == '-' || str[0] == '+') ? 1 : 0;
+    for (int i = start; i < str.length(); ++i) {
+        if (!isdigit(str[i])) return false;
+    }
+    return start < str.length();
+}
+
+vector<int> Vnos(istream& n) {
+    vector<int> v;
+    string l;
+    getline(n, l);
+    istringstream s(l);
+    string token;
+    while (s >> token) {
+        if (!IsNumber(token)) {
+            cout << " Недопустимое значение. " << endl;
+            exit(1);
+        }
+        v.push_back(stoi(token));
+    }
+    return v;
+}
+
+vector<int> rn(int size) { 
+    vector<int> v;
+    for (int i = 0; i < size; i++) {
+        v.push_back(rand() % 101);
+    }
+    return v;
+}
+
+int main() {
+    setlocale(LC_ALL, "RU");
+    srand((time(nullptr)));
+
+    vector<int> V0;
+    vector<vector<int>> vec;
+    int n, choice;
+
+    cout << " Выберите способ ввода значений:" << endl;
+    cout << " 1. Ввод вручную." << endl;
+    cout << " 2. Ввод из файла." << endl;
+    cout << " 3. Заполнение случайными числами." << endl;
+    cout << " ";
+    string choiceStr;
+    getline(cin, choiceStr);
+    if (!IsNumber(choiceStr)) {
+        cout << " Недопустимое значение. " << endl;
+        return 1;
+    }
+    choice = stoi(choiceStr);
+
+    switch (choice) {
+    case 1: {
+        cout << " Введите элементы, содержащиеся в векторе V0 (Нажмите Enter после ввода):" << endl;
+        cout << " ";
+        V0 = Vnos(cin);
+        if (V0.empty()) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+
+        cout << " Введите количество векторов N: ";
+        cout << " ";
+        string nStr;
+        getline(cin, nStr);
+        if (!IsNumber(nStr)) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        n = stoi(nStr);
+        if (n <= 0) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+
+        for (int i = 1; i <= n; ++i) {
+            cout << " Введите элементы вектора V" << i << ": ";
+            cout << " ";
+            vector<int> vi = Vnos(cin);
+            if (vi.size() < V0.size()) {
+                cout << " Недопустимое значение." << endl;
+                return 1;
+            }
+            vec.push_back(vi);
+        }
+        break;
+    }
+    case 2: {
+        ifstream file("Задание1.txt");
+        if (!file.is_open()) {
+            cout << " Не удалось открыть файл." << endl;
+            return 1;
+        }
+        cout << " Значения в файл должны быть записаны в таком виде: " << endl;
+        cout << " В 1 строке: элементы, содержащиеся в векторе V0." << endl;
+        cout << " Во 2 строке: число n." << endl;
+        cout << " В последующих строках: элементы, содержащиеся в других векторах." << endl;
+        V0 = Vnos(file);
+        if (V0.empty()) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+
+        string line;
+        getline(file, line);
+        if (!IsNumber(line)) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        n = stoi(line);
+
+        for (int i = 0; i < n; i++) {
+            vector<int> vi = Vnos(file);
+            if (vi.size() < V0.size()) {
+                cout << " Размер вектора V" << i + 1 << " меньше размера V0!" << endl;
+                return 1;
+            }
+            vec.push_back(vi);
+        }
+        file.close();
+        break;
+    }
+    case 3: {
+        cout << " Введите размер вектора V0: ";
+        string kStr;
+        getline(cin, kStr);
+        if (!IsNumber(kStr)) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        int k = stoi(kStr);
+        if (k <= 0) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        V0 = rn(k);
+
+        cout << " Введите количество векторов N: ";
+        string nStr;
+        getline(cin, nStr);
+        if (!IsNumber(nStr)) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        n = stoi(nStr);
+        if (n <= 0) {
+            cout << " Недопустимое значение." << endl;
+            return 1;
+        }
+        for (int i = 0; i < n; ++i) {
+            int size = V0.size() + rand() % 5;
+            vec.push_back(rn(size));
+        }
+        break;
+    }
+    default: {
+        cout << " Недопустимое значение." << endl;
+        return 1;
+    }
+    }
+
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (vec[i].size() < V0.size()) {
+            cout << " Размер вектора V" << i + 1 << " меньше размера V0." << endl;
+            return 1;
+        }
+    }
+
+    cout << endl;
+    set<int> V0_set(V0.begin(), V0.end());
+    int cnt = 0;
+    vector<int> tevec;
+
+    for (size_t i = 0; i < vec.size(); ++i) {
+        set<int> vi_set(vec[i].begin(), vec[i].end());
+        if (includes(vi_set.begin(), vi_set.end(), V0_set.begin(), V0_set.end())) {
+            cnt++;
+            tevec.push_back(i);
+        }
+    }
+
+    cout << " Вектор V0: ";
+    for (int num : V0) {
+        cout << num << " ";
+    }
+    cout << endl << endl;
+
+    cout << " Все векторы:" << endl;
+    for (size_t i = 0; i < vec.size(); i++) {
+        cout << " V" << i + 1 << ": ";
+        for (int num : vec[i]) {
+            cout << num << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    cout << " Количество векторов, содержащих все элементы V0: " << cnt << endl;
+
+    if (cnt > 0) {
+        cout << " Подходящие векторы:" << endl;
+        for (int i : tevec) {
+            cout << " V" << i + 1 << ": ";
+            for (int num : vec[i]) {
+                cout << num << " ";
+            }
+            cout << endl;
+        }
+    }
+    else {
+        cout << " Нет подходящих векторов." << endl;
+    }
+
+    return 0;
+}
+
+    
