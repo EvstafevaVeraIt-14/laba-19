@@ -1,0 +1,104 @@
+//STL5Assoc17. Дан вектор V, элементами которого являются английские слова, набранные 
+//заглавными буквами.Определить суммарную длину слов, начинающихся с одной и той же
+//буквы, и вывести все различные буквы, с которых начинаются элементы вектора V, вместе с
+//суммарной длиной этих элементов(в алфавитном порядке букв); длину выводить сразу после
+//соответствующей буквы.Использовать вспомогательное отображение M, ключами которого
+//являются начальные буквы элементов вектора V, а значениями — суммарная длина этих
+//элементов.При заполнении отображения M не использовать условные конструкции
+//(достаточно операций индексирования[], инкремента и функции - члена size для строк).
+//Элементы вектора V(при заполнении отображения M) и элементы отображения M(при
+//выводе полученных результатов) перебирать в цикле с параметром - итератором
+//соответствующего контейнера.
+#include <iostream>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <ctime>
+#include <algorithm>
+#include <string>
+#include <sstream> 
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "RU");
+    srand((time(nullptr)));
+    vector<string> V;
+    int choice, n;
+    cout << " Выберите способ ввода значений:" << endl;
+    cout << " 1. Ввод вручную." << endl;
+    cout << " 2. Ввод из файла." << endl;
+    cout << " 3. Заполнение случайными числами." << endl;
+    cout << " ";
+    cin >> choice;
+    cin.ignore();
+    switch (choice) {
+    case 1: { 
+        string line;
+        cout << " Введите слова на английском через пробел. ( Нажмите Enter после ввода )" << endl;
+        cout << " ";
+        getline(cin, line); 
+
+        istringstream iss(line); 
+        string word;
+        while (iss >> word) { 
+            transform(word.begin(), word.end(), word.begin(), ::toupper);
+            V.push_back(word);
+        }
+        break;
+    }
+    case 2: {
+        ifstream file("Задание2.txt");
+        if (!file.is_open()) {
+            cout << " Не удалось открыть файл." << endl;
+            return 1;
+        }
+        string wd;
+        while (file >> wd) {
+            transform(wd.begin(), wd.end(), wd.begin(), ::toupper);
+            V.push_back(wd);
+        }
+        file.close();
+        break;
+    }
+    case 3: {
+        cout << " Введите количество слов для строки: ";
+        cout << " ";
+        cin >> n;
+        for (int i = 0; i < n; i++) {
+            int len = 1 + rand() % 11;
+            string word;
+            for (int j = 0; j < len; j++) {
+                word += 'a' + rand() % 26;
+            }
+            transform(word.begin(), word.end(), word.begin(), ::toupper);
+            V.push_back(word);
+        }
+        break;
+    }
+    default: {
+        cout << " Недопустимое значение." << endl;
+        return 1;
+    }
+    }
+
+    cout << " Вектор: " << endl;
+    cout << " ";
+    for (const auto& word : V) {
+        cout << word << " ";
+    }
+    cout << endl;
+
+    map<char, int> M;
+    for (const auto& word : V) {
+        if (!word.empty()) {
+            char first = word[0];
+            M[first] += word.size();
+        }
+    }
+
+    for (const auto& it : M) {
+        cout << " " << it.first << " - " << it.second << endl;
+    }
+
+    return 0;
+}
